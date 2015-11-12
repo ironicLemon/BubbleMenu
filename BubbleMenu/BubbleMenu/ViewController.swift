@@ -29,9 +29,10 @@ final class ViewController: UIViewController {
         // Make it green
         self.greenCircle!.backgroundColor = UIColor.greenColor();
         
+        
         // Place it in the center of our screen
         self.greenCircle!.frame = CGRectMake(CGRectGetMidX(self.view.frame) - 50, CGRectGetMidY(self.view.frame) - 50, 100, 100)
-        self.greenCircle?.layer.cornerRadius = 50;
+        self.greenCircle?.layer.cornerRadius = 22;
         self.greenCircle?.clipsToBounds = true
         
         self.view.addSubview(self.greenCircle!);
@@ -54,6 +55,18 @@ final class ViewController: UIViewController {
         self.panGesture = UIPanGestureRecognizer(target: self, action: "panning:");
         self.greenCircle!.addGestureRecognizer(self.panGesture!);
         
+        let label = UILabel()
+        label.text = "item"
+        label.intrinsicContentSize()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        self.greenCircle!.addSubview(label)
+        
+        let xConstraint = NSLayoutConstraint(item: label, attribute: .CenterX, relatedBy: .Equal, toItem: self.greenCircle, attribute: .CenterX, multiplier: 1, constant: 0)
+        let yConstraint = NSLayoutConstraint(item: label, attribute: .CenterY, relatedBy: .Equal, toItem: self.greenCircle, attribute: .CenterY, multiplier: 1, constant: 0)
+        
+        self.greenCircle!.addConstraint(xConstraint)
+        self.greenCircle!.addConstraint(yConstraint)
+        
     }
     
     func panning(pan: UIPanGestureRecognizer) {
@@ -68,8 +81,6 @@ final class ViewController: UIViewController {
             let offset = UIOffsetMake(touchLocation.x - CGRectGetMidX(self.greenCircle!.bounds), touchLocation.y - CGRectGetMidY(self.greenCircle!.bounds))
             self.attach = UIAttachmentBehavior(item: self.greenCircle!, offsetFromCenter: offset, attachedToAnchor: location)
             self.animator!.addBehavior(self.attach!);
-            
-            //self.greenCircle!.center = location;
         }
         else if pan.state == .Changed {
             //self.greenCircle!.center = location;
