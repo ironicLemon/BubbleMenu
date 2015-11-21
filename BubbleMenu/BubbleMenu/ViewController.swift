@@ -8,7 +8,7 @@
 
 import UIKit
 
-final class ViewController: UIViewController {
+final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGestureRecognizerDelegate {
     
     private var greenCircle: UIView?
     
@@ -21,41 +21,46 @@ final class ViewController: UIViewController {
     private var attach: UIAttachmentBehavior?
     
     private var labelConstraint : NSLayoutConstraint?
+    
+    private var widthConstraint : NSLayoutConstraint?
+    private var heightConstraint : NSLayoutConstraint?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Instantiate the box View
-        self.greenCircle = UIView();
+        self.greenCircle = UIView()
         
         // Make it green
         self.greenCircle!.backgroundColor = UIColor.greenColor();
+        self.greenCircle!.translatesAutoresizingMaskIntoConstraints = false
+        self.greenCircle!.intrinsicContentSize()
+        self.view.addSubview(self.greenCircle!)
+        
+        self.widthConstraint = NSLayoutConstraint (item: self.greenCircle!,
+            attribute: NSLayoutAttribute.Width,
+            relatedBy: NSLayoutRelation.Equal,
+            toItem: nil,
+            attribute: NSLayoutAttribute.NotAnAttribute,
+            multiplier: 1,
+            constant: 100)
+        
+        self.greenCircle!.addConstraint(self.widthConstraint!)
+        
+        self.heightConstraint = NSLayoutConstraint (item: self.greenCircle!,
+            attribute: NSLayoutAttribute.Height,
+            relatedBy: NSLayoutRelation.Equal,
+            toItem: nil,
+            attribute: NSLayoutAttribute.NotAnAttribute,
+            multiplier: 1,
+            constant: 100)
+        
+        self.greenCircle!.addConstraint(self.heightConstraint!)
         
         // Place it in the center of our screen
-        self.greenCircle!.frame = CGRectMake(CGRectGetMidX(self.view.frame) - 50, CGRectGetMidY(self.view.frame) - 50, 100, 100)
+        //self.greenCircle!.frame = CGRectMake(CGRectGetMidX(self.view.frame) - 50, CGRectGetMidY(self.view.frame) - 50, 100, 100)
         self.greenCircle?.layer.cornerRadius = 22;
         self.greenCircle?.clipsToBounds = true
-        
-        self.view.addSubview(self.greenCircle!);
-        
-        // Instantiates the animator
-        self.animator = UIDynamicAnimator(referenceView: self.view);
-        
-        // Instantiates the Gravity Behavior and assigns
-        self.gravity = UIGravityBehavior(items: [self.greenCircle!]);
-        
-        self.animator!.addBehavior(self.gravity!)
-        
-        self.collision = UICollisionBehavior(items: [self.greenCircle!]);
-        
-        // et a collision boundary according to the bounds of the dynamic animator's coordinate system (in our case the boundaries of self.view,
-        self.collision!.translatesReferenceBoundsIntoBoundary = true;
-        
-        self.animator!.addBehavior(self.collision!)
-        
-        self.panGesture = UIPanGestureRecognizer(target: self, action: "panning:");
-        self.greenCircle!.addGestureRecognizer(self.panGesture!);
-        
         
         let label = UILabel()
         label.text = "item"
@@ -69,9 +74,35 @@ final class ViewController: UIViewController {
         self.greenCircle!.addConstraint(self.labelConstraint!)
         self.greenCircle!.addConstraint(xConstraint)
         
+
+        
+        self.panGesture = UIPanGestureRecognizer(target: self, action: "panning:")
+        self.panGesture?.delegate = self
+        self.greenCircle!.addGestureRecognizer(self.panGesture!)
+        
         let tapGesture = UITapGestureRecognizer(target: self, action: "tap:")
-        //tapGesture.delegate = self
+        tapGesture.delegate = self
         self.greenCircle!.addGestureRecognizer(tapGesture)
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        // Instantiates the animator
+        self.animator = UIDynamicAnimator(referenceView: self.view);
+
+        // Instantiates the Gravity Behavior and assigns
+        self.gravity = UIGravityBehavior(items: [self.greenCircle!]);
+
+        self.animator!.addBehavior(self.gravity!)
+
+        self.collision = UICollisionBehavior(items: [self.greenCircle!]);
+        self.collision?.collisionDelegate = self
+
+        // et a collision boundary according to the bounds of the dynamic animator's coordinate system (in our case the boundaries of self.view,
+        self.collision!.translatesReferenceBoundsIntoBoundary = true
+        
+        self.animator!.addBehavior(self.collision!)
     }
     
     func tap(tapGesture: UITapGestureRecognizer) {
@@ -79,16 +110,16 @@ final class ViewController: UIViewController {
         print("item tapped")
         
         let item = tapGesture.view
-        item?.removeGestureRecognizer(tapGesture)
-        
-        let label = item?.subviews[0]
-        
+        //item?.removeGestureRecognizer(tapGesture)
+  
         weak var weakSelf = self
         
-        UIView.animateWithDuration(0.2, animations: { () -> Void in
-            //label?.removeFromSuperview()
+        self.animator!.removeAllBehaviors()
+        
+        UIView.animateWithDuration(0.4, animations: { () -> Void in
             
-            item?.transform = CGAffineTransformMakeScale(1.8, 1.8)
+            weakSelf?.heightConstraint?.constant = 150
+            weakSelf?.widthConstraint?.constant = 150
             
             let image = UIImage(named: "0007")
             let imageView = UIImageView(image: image)
@@ -103,10 +134,15 @@ final class ViewController: UIViewController {
             item?.addConstraint(yConstraint)
             
             weakSelf?.labelConstraint?.constant = 22
-                
+            
+            
 
             }) { (result) -> Void in
-               item?.layoutIfNeeded()
+                //item?.layoutIfNeeded()
+                //self.animator!.updateItemUsingCurrentState(item!)
+                //item?.updateConstraintsIfNeeded()
+                self.animator!.addBehavior(self.gravity!)
+                self.animator!.addBehavior(self.collision!)
         }
     }
     
@@ -140,6 +176,15 @@ final class ViewController: UIViewController {
             self.animator!.addBehavior(self.gravity!)
             self.animator!.addBehavior(self.collision!)
         }
+    }
+    
+    func collisionBehavior(behavior: UICollisionBehavior, beganContactForItem item: UIDynamicItem, withBoundaryIdentifier identifier: NSCopying?, atPoint p: CGPoint) {
+        print("Boundary contact occurred - \(identifier)")
+    }
+    
+    func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+        print("gesture recognizer begin \(gestureRecognizer)")
+        return true
     }
 
     override func didReceiveMemoryWarning() {
