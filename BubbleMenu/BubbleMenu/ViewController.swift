@@ -32,29 +32,38 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
         self.greenCircle = UIView()
         
         // Make it green
-        self.greenCircle!.backgroundColor = UIColor.greenColor();
-        self.greenCircle!.translatesAutoresizingMaskIntoConstraints = false
+        self.greenCircle?.backgroundColor = UIColor.greenColor();
+        self.greenCircle?.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(self.greenCircle!)
         
-        self.widthConstraint = NSLayoutConstraint (item: self.greenCircle!,
-            attribute: NSLayoutAttribute.Width,
-            relatedBy: NSLayoutRelation.Equal,
+        self.widthConstraint = NSLayoutConstraint (
+            item: self.greenCircle!,
+            attribute: .Width,
+            relatedBy: .Equal,
             toItem: nil,
-            attribute: NSLayoutAttribute.NotAnAttribute,
+            attribute: .NotAnAttribute,
             multiplier: 1,
             constant: 100)
         
-        self.greenCircle!.addConstraint(self.widthConstraint!)
+        self.greenCircle?.addConstraint(self.widthConstraint!)
         
-        self.heightConstraint = NSLayoutConstraint (item: self.greenCircle!,
-            attribute: NSLayoutAttribute.Height,
-            relatedBy: NSLayoutRelation.Equal,
+        self.heightConstraint = NSLayoutConstraint (
+            item: self.greenCircle!,
+            attribute: .Height,
+            relatedBy: .Equal,
             toItem: nil,
-            attribute: NSLayoutAttribute.NotAnAttribute,
+            attribute: .NotAnAttribute,
             multiplier: 1,
             constant: 100)
         
-        self.greenCircle!.addConstraint(self.heightConstraint!)
+        self.greenCircle?.addConstraint(self.heightConstraint!)
+        
+        // set x and y position
+        let xCentre = NSLayoutConstraint(item: self.greenCircle!, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .Left, multiplier: 1, constant: 250)
+        let yCentre = NSLayoutConstraint(item: self.greenCircle!, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier: 1, constant: 250)
+        
+        self.view.addConstraint(xCentre)
+        self.view.addConstraint(yCentre)
         
         self.greenCircle?.layer.cornerRadius = 50;
         self.greenCircle?.clipsToBounds = true
@@ -68,18 +77,18 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
         let xConstraint = NSLayoutConstraint(item: label, attribute: .CenterX, relatedBy: .Equal, toItem: self.greenCircle, attribute: .CenterX, multiplier: 1, constant: 0)
         self.labelConstraint = NSLayoutConstraint(item: label, attribute: .CenterY, relatedBy: .Equal, toItem: self.greenCircle, attribute: .CenterY, multiplier: 1, constant: 0)
         
-        self.greenCircle!.addConstraint(self.labelConstraint!)
-        self.greenCircle!.addConstraint(xConstraint)
+        self.greenCircle?.addConstraint(self.labelConstraint!)
+        self.greenCircle?.addConstraint(xConstraint)
         
 
         
         self.panGesture = UIPanGestureRecognizer(target: self, action: "panning:")
         self.panGesture?.delegate = self
-        self.greenCircle!.addGestureRecognizer(self.panGesture!)
+        self.greenCircle?.addGestureRecognizer(self.panGesture!)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: "tap:")
         tapGesture.delegate = self
-        self.greenCircle!.addGestureRecognizer(tapGesture)
+        self.greenCircle?.addGestureRecognizer(tapGesture)
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -94,6 +103,13 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
             return;
         }
         
+        print("layout subviews")
+        print("frame height \(self.greenCircle!.frame.size.height)")
+        print("frame width \(self.greenCircle!.frame.size.height)")
+        print("frame x \(self.greenCircle!.frame.origin.x)")
+        print("frame y \(self.greenCircle!.frame.origin.x)")
+
+        
         // Instantiates the animator
         self.animator = UIDynamicAnimator(referenceView: self.view);
         
@@ -102,7 +118,7 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
         // Instantiates the Gravity Behavior and assigns
         self.gravity = UIGravityBehavior(items: [self.greenCircle!]);
         self.gravity?.action = { () in
-            self.view.updateConstraintsIfNeeded()
+            //self.view.updateConstraintsIfNeeded()
         }
         
         self.animator!.addBehavior(self.gravity!)
@@ -111,7 +127,7 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
         self.collision?.collisionDelegate = self
         
         self.collision?.action = { () in
-            self.view.updateConstraintsIfNeeded()
+            //self.view.updateConstraintsIfNeeded()
         }
         
         // et a collision boundary according to the bounds of the dynamic animator's coordinate system (in our case the boundaries of self.view,
@@ -138,10 +154,23 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
         
         UIView.animateWithDuration(0.4, animations: { () -> Void in
             
-            //weakSelf?.view.updateConstraintsIfNeeded()
+            //weakSelf?.view.layoutIfNeeded()
             
-            weakSelf?.heightConstraint?.constant = 150
-            weakSelf?.widthConstraint?.constant = 150
+            //item?.removeConstraints(item!.constraints)
+            
+            weakSelf?.heightConstraint?.constant += 50
+            weakSelf?.widthConstraint?.constant += 50
+            
+            //item?.addConstraint(weakSelf!.heightConstraint!)
+            //item?.addConstraint(weakSelf!.widthConstraint!)
+            
+            print("frame height \(item?.frame.size.height)")
+            print("frame width \(item?.frame.size.height)")
+            
+            // TODO translate into view click position
+            print("frame x \(item?.frame.origin.x)")
+            print("frame y \(item?.frame.origin.x)")
+            
             item?.layer.cornerRadius = 75;
             item?.layer.borderWidth = 2.0
             item?.layer.borderColor = UIColor.brownColor().CGColor
@@ -162,12 +191,18 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
 //            
 //            weakSelf?.labelConstraint?.constant = 22
             
-            //self.view.updateConstraintsIfNeeded()
+            
+            weakSelf?.view.updateConstraintsIfNeeded()
             //self.animator!.updateItemUsingCurrentState(item!)
             //self.view.updateConstraintsIfNeeded()
+            
+            //weakSelf?.view.layoutIfNeeded()
 
             }) { (result) -> Void in
                 
+                //self.view.updateConstraints()
+                
+                //self.view.layoutIfNeeded()
                 
                 //self.view.updateConstraintsIfNeeded()
                 //item?.layoutIfNeeded()
@@ -180,9 +215,7 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
                 //item?.updateConstraintsIfNeeded()
                 //self.view.updateConstraintsIfNeeded()
                 
-                //self.view.updateConstraints()
                 
-                //self.view.layoutIfNeeded()
         }
     }
     
@@ -223,7 +256,9 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
         //self.view.updateConstraints()
         //self.animator!.updateItemUsingCurrentState(self.view)
         
-        //animator.referenceView?.updateConstraints()
+        self.view.layoutIfNeeded()
+        
+        //animator.referenceView?.updateConstraintsIfNeeded()
     }
     
     func collisionBehavior(behavior: UICollisionBehavior, beganContactForItem item: UIDynamicItem, withBoundaryIdentifier identifier: NSCopying?, atPoint p: CGPoint) {
