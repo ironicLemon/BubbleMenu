@@ -103,11 +103,11 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
             return;
         }
         
-        print("layout subviews")
-        print("frame height \(self.greenCircle!.frame.size.height)")
-        print("frame width \(self.greenCircle!.frame.size.height)")
-        print("frame x \(self.greenCircle!.frame.origin.x)")
-        print("frame y \(self.greenCircle!.frame.origin.x)")
+//        print("layout subviews")
+//        print("frame height \(self.greenCircle!.frame.size.height)")
+//        print("frame width \(self.greenCircle!.frame.size.width)")
+//        print("frame x \(self.greenCircle!.frame.origin.x)")
+//        print("frame y \(self.greenCircle!.frame.origin.y)")
 
         
         // Instantiates the animator
@@ -137,6 +137,19 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
         
     }
     
+    override func updateViewConstraints() {
+        super.updateViewConstraints()
+        
+        print("update constrinats")
+        print("frame height \(self.greenCircle!.frame.size.height)")
+        print("frame width \(self.greenCircle!.frame.size.width)")
+        print("frame x \(self.greenCircle!.frame.origin.x)")
+        print("frame y \(self.greenCircle!.frame.origin.y)")
+        
+        // TODO reset constraints to reflect the frame
+        
+    }
+    
     func tap(tapGesture: UITapGestureRecognizer) {
         
         print("item tapped")
@@ -155,21 +168,27 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
         UIView.animateWithDuration(0.4, animations: { () -> Void in
             
             //weakSelf?.view.layoutIfNeeded()
+            //weakSelf?.view.updateConstraints()
             
             //item?.removeConstraints(item!.constraints)
             
-            weakSelf?.heightConstraint?.constant += 50
-            weakSelf?.widthConstraint?.constant += 50
+            weakSelf?.heightConstraint?.constant = 150
+            weakSelf?.widthConstraint?.constant = 150
             
             //item?.addConstraint(weakSelf!.heightConstraint!)
             //item?.addConstraint(weakSelf!.widthConstraint!)
             
+            let touchLocation = tapGesture.locationInView(self.view);
+            
+            print("touch x \(touchLocation.x)")
+            print("touch y \(touchLocation.y)")
+            
             print("frame height \(item?.frame.size.height)")
-            print("frame width \(item?.frame.size.height)")
+            print("frame width \(item?.frame.size.width)")
             
             // TODO translate into view click position
             print("frame x \(item?.frame.origin.x)")
-            print("frame y \(item?.frame.origin.x)")
+            print("frame y \(item?.frame.origin.y)")
             
             item?.layer.cornerRadius = 75;
             item?.layer.borderWidth = 2.0
@@ -191,8 +210,10 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
 //            
 //            weakSelf?.labelConstraint?.constant = 22
             
+            //weakSelf?.view.updateConstraintsIfNeeded()
+            //weakSelf?.view.layoutIfNeeded()
             
-            weakSelf?.view.updateConstraintsIfNeeded()
+            
             //self.animator!.updateItemUsingCurrentState(item!)
             //self.view.updateConstraintsIfNeeded()
             
@@ -215,7 +236,16 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
                 //item?.updateConstraintsIfNeeded()
                 //self.view.updateConstraintsIfNeeded()
                 
+//                print("animation completion block")
+//                print("frame height \(item?.frame.size.height)")
+//                print("frame width \(item?.frame.size.width)")
+//                
+//                // TODO translate into view click position
+//                print("frame x \(item?.frame.origin.x)")
+//                print("frame y \(item?.frame.origin.y)")
                 
+                //weakSelf?.view.updateConstraintsIfNeeded()
+                //weakSelf?.view.layoutIfNeeded()
         }
     }
     
@@ -256,9 +286,14 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
         //self.view.updateConstraints()
         //self.animator!.updateItemUsingCurrentState(self.view)
         
+        self.view.setNeedsUpdateConstraints()
         self.view.layoutIfNeeded()
         
-        //animator.referenceView?.updateConstraintsIfNeeded()
+//        print("ldynamic animator paused")
+//        print("frame height \(self.greenCircle!.frame.size.height)")
+//        print("frame width \(self.greenCircle!.frame.size.width)")
+//        print("frame x \(self.greenCircle!.frame.origin.x)")
+//        print("frame y \(self.greenCircle!.frame.origin.y)")
     }
     
     func collisionBehavior(behavior: UICollisionBehavior, beganContactForItem item: UIDynamicItem, withBoundaryIdentifier identifier: NSCopying?, atPoint p: CGPoint) {
