@@ -24,6 +24,9 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
     
     private var widthConstraint : NSLayoutConstraint?
     private var heightConstraint : NSLayoutConstraint?
+    
+    private var xBubbleCentre : NSLayoutConstraint?
+    private var yBubbleCentre : NSLayoutConstraint?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,11 +62,11 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
         self.greenCircle?.addConstraint(self.heightConstraint!)
         
         // set x and y position
-        let xCentre = NSLayoutConstraint(item: self.greenCircle!, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .Left, multiplier: 1, constant: 250)
-        let yCentre = NSLayoutConstraint(item: self.greenCircle!, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier: 1, constant: 250)
+        xBubbleCentre = NSLayoutConstraint(item: self.greenCircle!, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .Left, multiplier: 1, constant: 250)
+        yBubbleCentre = NSLayoutConstraint(item: self.greenCircle!, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier: 1, constant: 250)
         
-        self.view.addConstraint(xCentre)
-        self.view.addConstraint(yCentre)
+        self.view.addConstraint(xBubbleCentre!)
+        self.view.addConstraint(yBubbleCentre!)
         
         self.greenCircle?.layer.cornerRadius = 50;
         self.greenCircle?.clipsToBounds = true
@@ -147,7 +150,8 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
         print("frame y \(self.greenCircle!.frame.origin.y)")
         
         // TODO reset constraints to reflect the frame
-        
+        self.xBubbleCentre!.constant = self.greenCircle!.center.x
+        self.yBubbleCentre!.constant = self.greenCircle!.center.y
     }
     
     func tap(tapGesture: UITapGestureRecognizer) {
@@ -178,17 +182,17 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
             //item?.addConstraint(weakSelf!.heightConstraint!)
             //item?.addConstraint(weakSelf!.widthConstraint!)
             
-            let touchLocation = tapGesture.locationInView(self.view);
-            
-            print("touch x \(touchLocation.x)")
-            print("touch y \(touchLocation.y)")
-            
-            print("frame height \(item?.frame.size.height)")
-            print("frame width \(item?.frame.size.width)")
-            
-            // TODO translate into view click position
-            print("frame x \(item?.frame.origin.x)")
-            print("frame y \(item?.frame.origin.y)")
+//            let touchLocation = tapGesture.locationInView(self.view);
+//            
+//            print("touch x \(touchLocation.x)")
+//            print("touch y \(touchLocation.y)")
+//            
+//            print("frame height \(item?.frame.size.height)")
+//            print("frame width \(item?.frame.size.width)")
+//            
+//            // TODO translate into view click position
+//            print("frame x \(item?.frame.origin.x)")
+//            print("frame y \(item?.frame.origin.y)")
             
             item?.layer.cornerRadius = 75;
             item?.layer.borderWidth = 2.0
@@ -287,7 +291,7 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
         //self.animator!.updateItemUsingCurrentState(self.view)
         
         self.view.setNeedsUpdateConstraints()
-        self.view.layoutIfNeeded()
+        //self.view.layoutIfNeeded()
         
 //        print("ldynamic animator paused")
 //        print("frame height \(self.greenCircle!.frame.size.height)")
