@@ -121,9 +121,18 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
     
     override func updateViewConstraints() {
         super.updateViewConstraints()
+        
+        print("update view constriants")
 
-        self.xBubbleCentre!.constant = self.greenCircle!.center.x
-        self.yBubbleCentre!.constant = self.greenCircle!.center.y
+        // if the frame has already been realised then adjust the constraints
+        if (self.greenCircle?.frame.width > 0)
+        {
+            self.xBubbleCentre!.constant = self.greenCircle!.center.x
+            self.yBubbleCentre!.constant = self.greenCircle!.center.y
+            
+            self.widthConstraint!.constant = self.greenCircle!.frame.size.width
+            self.heightConstraint!.constant = self.greenCircle!.frame.size.height
+        }
     }
     
     func tap(tapGesture: UITapGestureRecognizer) {
@@ -139,27 +148,31 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
         
         let image = UIImage(named: "0007")
         let imageView = UIImageView(image: image)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
+        //imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.alpha = 0
         
         item?.addSubview(imageView)
         
-        let xConstraint = NSLayoutConstraint(item: imageView, attribute: .CenterX, relatedBy: .Equal, toItem: item, attribute: .CenterX, multiplier: 1, constant: 0)
-        let yConstraint = NSLayoutConstraint(item: imageView, attribute: .CenterY, relatedBy: .Equal, toItem: item, attribute: .CenterY, multiplier: 1, constant: 0)
+        //let xConstraint = NSLayoutConstraint(item: imageView, attribute: .CenterX, relatedBy: .Equal, toItem: item, attribute: .CenterX, multiplier: 1, constant: 0)
+        //let yConstraint = NSLayoutConstraint(item: imageView, attribute: .CenterY, relatedBy: .Equal, toItem: item, attribute: .CenterY, multiplier: 1, constant: 0)
         
-        item?.addConstraint(xConstraint)
-        item?.addConstraint(yConstraint)
+        //item?.addConstraint(xConstraint)
+        //item?.addConstraint(yConstraint)
         
-        weakSelf?.labelConstraint?.constant = 22
+        //weakSelf?.labelConstraint?.constant = 22
         
-        item?.layoutIfNeeded()
+        //item?.layoutIfNeeded()
         
+
         UIView.animateWithDuration(1.4, animations: { () -> Void in
             
-            weakSelf?.heightConstraint?.constant = 150
-            weakSelf?.widthConstraint?.constant = 150
+            item?.transform = CGAffineTransformMakeScale(1.5, 1.5)
+            
+            //weakSelf?.heightConstraint?.constant = 150
+            //weakSelf?.widthConstraint?.constant = 150
 
             // TODO update the physics engine to smooth out anmiation??
+            
             
             //item?.layoutIfNeeded()
             //item?.setNeedsUpdateConstraints()
@@ -168,15 +181,18 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
             item?.layer.cornerRadius = 75;
             
             //item?.setNeedsUpdateConstraints()
-            item?.layoutIfNeeded()
+            //self.animator?.updateItemUsingCurrentState(item!)
+            
+            //item?.setNeedsUpdateConstraints()
+            //item?.layoutIfNeeded()
 
             }) { (result) -> Void in
 
                 weakSelf?.animator!.addBehavior(self.gravity!)
                 weakSelf?.animator!.addBehavior(self.collision!)
+                
+                item?.setNeedsUpdateConstraints()
         }
-        
-        
     }
     
     func panning(pan: UIPanGestureRecognizer) {
