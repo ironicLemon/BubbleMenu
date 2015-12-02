@@ -130,8 +130,11 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
             self.xBubbleCentre!.constant = self.greenCircle!.center.x
             self.yBubbleCentre!.constant = self.greenCircle!.center.y
             
-            self.widthConstraint!.constant = self.greenCircle!.frame.size.width
-            self.heightConstraint!.constant = self.greenCircle!.frame.size.height
+//            print("width \(self.greenCircle!.frame.size.width)")
+//            print("height \(self.greenCircle!.frame.size.height)")
+//            
+//            self.widthConstraint!.constant = self.greenCircle!.frame.size.width
+//            self.heightConstraint!.constant = self.greenCircle!.frame.size.height
         }
     }
     
@@ -148,51 +151,54 @@ final class ViewController: UIViewController, UICollisionBehaviorDelegate, UIGes
         
         let image = UIImage(named: "0007")
         let imageView = UIImageView(image: image)
-        //imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.alpha = 0
         
         item?.addSubview(imageView)
         
-        //let xConstraint = NSLayoutConstraint(item: imageView, attribute: .CenterX, relatedBy: .Equal, toItem: item, attribute: .CenterX, multiplier: 1, constant: 0)
-        //let yConstraint = NSLayoutConstraint(item: imageView, attribute: .CenterY, relatedBy: .Equal, toItem: item, attribute: .CenterY, multiplier: 1, constant: 0)
+        let xConstraint = NSLayoutConstraint(item: imageView, attribute: .CenterX, relatedBy: .Equal, toItem: item, attribute: .CenterX, multiplier: 1, constant: 0)
+        let yConstraint = NSLayoutConstraint(item: imageView, attribute: .CenterY, relatedBy: .Equal, toItem: item, attribute: .CenterY, multiplier: 1, constant: 0)
         
-        //item?.addConstraint(xConstraint)
-        //item?.addConstraint(yConstraint)
+        item?.addConstraint(xConstraint)
+        item?.addConstraint(yConstraint)
         
-        //weakSelf?.labelConstraint?.constant = 22
         
-        //item?.layoutIfNeeded()
+        let animation = CABasicAnimation(keyPath: "cornerRadius")
+        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        animation.fromValue = self.greenCircle!.layer.cornerRadius
+        animation.toValue = 75
+        animation.duration = 1.4
+        self.greenCircle!.layer.addAnimation(animation, forKey: "cornerRadius")
         
+        item?.layoutIfNeeded()
 
         UIView.animateWithDuration(1.4, animations: { () -> Void in
             
-            item?.transform = CGAffineTransformMakeScale(1.5, 1.5)
+            weakSelf?.heightConstraint?.constant = 150
+            weakSelf?.widthConstraint?.constant = 150
             
-            //weakSelf?.heightConstraint?.constant = 150
-            //weakSelf?.widthConstraint?.constant = 150
+            weakSelf?.labelConstraint?.constant = 22
 
-            // TODO update the physics engine to smooth out anmiation??
-            
-            
-            //item?.layoutIfNeeded()
-            //item?.setNeedsUpdateConstraints()
             imageView.alpha = 1.0
-
-            item?.layer.cornerRadius = 75;
             
-            //item?.setNeedsUpdateConstraints()
-            //self.animator?.updateItemUsingCurrentState(item!)
+            self.view.layoutIfNeeded()
             
-            //item?.setNeedsUpdateConstraints()
-            //item?.layoutIfNeeded()
 
             }) { (result) -> Void in
 
-                weakSelf?.animator!.addBehavior(self.gravity!)
-                weakSelf?.animator!.addBehavior(self.collision!)
+                item?.layer.cornerRadius = 75;
                 
-                item?.setNeedsUpdateConstraints()
+                //weakSelf?.animator!.addBehavior(self.gravity!)
+                //weakSelf?.animator!.addBehavior(self.collision!)
+                
+                //self.animator?.updateItemUsingCurrentState(item!)
+                
+                //item?.setNeedsUpdateConstraints()
+                
+                print("animation complete")
         }
+        
+        
     }
     
     func panning(pan: UIPanGestureRecognizer) {
